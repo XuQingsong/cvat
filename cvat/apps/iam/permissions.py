@@ -86,6 +86,7 @@ def build_iam_context(
 ) -> IamContext:
     return {
         "user_id": request.user.id,
+        "username": request.user.username,
         "group_name": request.iam_context["privilege"],
         "org_specified": request.iam_context["organization_specified"],
         "org_id": getattr(organization, "id", None),
@@ -105,6 +106,7 @@ def get_iam_context(request, obj) -> dict[str, Any]:
 class OpenPolicyAgentPermission(metaclass=ABCMeta):
     url: str
     user_id: int
+    username: str = ""  # dp：服务账号识别（iam/rules/dp.rego）
     group_name: str | None
     org_specified: bool
     org_id: int | None
@@ -184,6 +186,7 @@ class OpenPolicyAgentPermission(metaclass=ABCMeta):
         return {
             "user": {
                 "id": self.user_id,
+                "username": getattr(self, "username", ""),
                 "privilege": self.group_name,
             },
             "organization": (

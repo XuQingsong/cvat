@@ -137,6 +137,7 @@ INSTALLED_APPS = [
     "cvat.apps.iam",
     "cvat.apps.dataset_manager",
     "cvat.apps.organizations",
+    "cvat.apps.dpsso",
     "cvat.apps.engine",
     "cvat.apps.dataset_repo",
     "cvat.apps.lambda_manager",
@@ -877,3 +878,8 @@ USER_LAST_ACTIVITY_UPDATE_MIN_INTERVAL = timedelta(days=1)
 
 # Health check settings
 HEALTH_CHECK = {"DISK_USAGE_MAX": int(os.getenv("CVAT_HEALTH_DISK_USAGE_MAX", 90))}
+
+
+# --- data-pipeline SSO 桥（dpsso 应用；DP_PATCHES.md）---
+# Portal BFF 一次性票据共享密钥；空 = SSO 端点禁用。
+DP_SSO_SECRET = os.getenv("CVAT_DP_SSO_SECRET", "")

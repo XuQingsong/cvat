@@ -120,6 +120,7 @@ default allow := false
 
 allow if {
     utils.is_admin
+    not utils.is_dp_restricted_job_scope
 }
 
 allow if {
@@ -132,6 +133,7 @@ allow if {
     }
     organizations.is_same_org_as_resource_with_perm(organizations.MAINTAINER)
     utils.has_perm(utils.USER)
+    not utils.is_dp_restricted_job_scope
 }
 
 allow if {
@@ -213,11 +215,12 @@ allow if {
     is_job_staff
 }
 
+# dp：assignee/stage 单一事实源 = annotation 服务账号（见 iam/rules/dp.rego）。
 allow if {
     input.scope in {utils.UPDATE_STAGE, utils.UPDATE_ASSIGNEE}
     organizations.is_same_context_as_resource
     utils.has_perm(utils.WORKER)
-    is_task_staff
+    utils.is_dp_service_account
 }
 
 allow if {

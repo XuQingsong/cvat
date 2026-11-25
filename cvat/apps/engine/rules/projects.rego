@@ -61,6 +61,7 @@ is_project_staff if {
 
 allow if {
     utils.is_admin
+    not utils.is_dp_restricted_project_scope
 }
 
 allow if {
@@ -71,12 +72,14 @@ allow if {
     }
     organizations.is_same_org_as_resource_with_perm(organizations.MAINTAINER)
     utils.has_perm(utils.USER)
+    not utils.is_dp_restricted_project_scope
 }
 
 allow if {
     input.scope in {utils.CREATE, utils.IMPORT_BACKUP}
     organizations.is_same_context_as_resource_with_perm(organizations.SUPERVISOR)
     utils.has_perm(utils.USER)
+    not utils.is_dp_restricted_project_scope
 }
 
 allow if {
@@ -118,6 +121,7 @@ allow if {
     organizations.is_same_context_as_resource
     utils.has_perm(utils.WORKER)
     utils.is_resource_owner
+    not utils.is_dp_restricted_project_scope
 }
 
 allow if {
@@ -132,6 +136,14 @@ allow if {
     organizations.is_same_context_as_resource
     utils.is_resource_owner
     utils.has_perm(utils.WORKER)
+    not utils.is_dp_restricted_project_scope
+}
+
+# dp：project 建删/指派由 annotation 服务账号统一管理（见 iam/rules/dp.rego）。
+allow if {
+    input.scope in {utils.CREATE, utils.DELETE, utils.UPDATE_ASSIGNEE}
+    organizations.is_same_context_as_resource
+    utils.is_dp_service_account
 }
 
 allow if {
