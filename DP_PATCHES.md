@@ -20,6 +20,8 @@ data-pipeline annotation 服务（Portal 驱动，`dp-annotation` 服务账号�
 | `cvat/apps/engine/rules/jobs.rego` | `is_admin`/maintainer allow 追加 `not utils.is_dp_restricted_job_scope`；`{UPDATE_STAGE,UPDATE_ASSIGNEE}` 规则条件 `is_task_staff`→`utils.is_dp_service_account`。人类仍可 UPDATE_STATE（完成自己的 job）与标注。 |
 | `cvat/apps/engine/rules/tasks.rego` | 同法：`is_admin`/maintainer/`{CREATE,IMPORT_BACKUP}`/`is_project_staff`/`is_task_owner` 规则追加 `not is_dp_restricted_task_scope`（CREATE/DELETE/UPDATE_ASSIGNEE）；新增服务账号 allow。 |
 | `cvat/apps/engine/rules/projects.rego` | 同法（CREATE/DELETE/UPDATE_ASSIGNEE）。 |
+| `cvat/apps/engine/rules/tests/generators/{jobs,tasks,projects}_test.gen.rego.py` | `eval_rule` 头部：受限 scope 对非 SA 恒 False（生成用例无 username，SA 永不命中 → 期望矩阵与新语义一致）。 |
+| `cvat/apps/engine/rules/tests/dp/dp_ssa_test.rego` | 新增 OPA 断言：SA 可 assignee/stage/建删；human admin/user/worker 不可；worker 仍可 update:state 完成自己 job（`opa test` 16/16）。 |
 
 ## 语义
 

@@ -80,6 +80,9 @@ def is_same_org(org1, org2):
 
 
 def eval_rule(scope, context, ownership, privilege, membership, data):
+    # dp：assignee/stage/建删仅 dp-annotation 服务账号（生成用例无 username → 恒 deny）。
+    if scope in ("create", "delete", "update:assignee"):
+        return False
     if privilege == "admin":
         return True
 
