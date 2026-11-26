@@ -9,6 +9,7 @@ import React, {
 } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { shallowEqual } from 'utils/redux';
+import DPManagedGate from 'utils/dp-managed';
 import { useHistory, useParams } from 'react-router';
 import Spin from 'antd/lib/spin';
 import { Row, Col } from 'antd/lib/grid';
@@ -333,51 +334,56 @@ export default function ProjectPageComponent(): JSX.Element {
                                 <TasksCSVExportButton query={{ ...tasksQuery, projectId: id }} />
                             </div>
                         </div>
-                        <Popover
-                            trigger={['click']}
-                            destroyTooltipOnHide
-                            overlayInnerStyle={{ padding: 0 }}
-                            content={(
-                                <CvatDropdownMenuPaper>
-                                    {canCreateGenericTask ? (
-                                        <>
+                        {/* data-pipeline：托管模式非 SA 用户不显示建任务入口 */}
+                        <DPManagedGate>
+                            <Popover
+                                trigger={['click']}
+                                destroyTooltipOnHide
+                                overlayInnerStyle={{ padding: 0 }}
+                                content={(
+                                    <CvatDropdownMenuPaper>
+                                        {canCreateGenericTask ? (
+                                            <>
+                                                <Button
+                                                    type='primary'
+                                                    icon={<PlusOutlined />}
+                                                    className='cvat-create-task-button'
+                                                    onClick={() => history.push(`/tasks/create?projectId=${id}`)}
+                                                >
+                                                    Create a new task
+                                                </Button>
+                                                <Button
+                                                    type='primary'
+                                                    icon={<span className='anticon'><MultiPlusIcon /></span>}
+                                                    className='cvat-create-multi-tasks-button'
+                                                    onClick={() => history.push(
+                                                        `/tasks/create?projectId=${id}&many=true`,
+                                                    )}
+                                                >
+                                                    Create multi tasks
+                                                </Button>
+                                            </>
+                                        ) : null}
+                                        {canCreateAudioTask ? (
                                             <Button
                                                 type='primary'
-                                                icon={<PlusOutlined />}
-                                                className='cvat-create-task-button'
-                                                onClick={() => history.push(`/tasks/create?projectId=${id}`)}
+                                                icon={<SoundOutlined />}
+                                                className='cvat-create-audio-task-button'
+                                                onClick={() => history.push(`/tasks/create?projectId=${id}&type=audio`)}
                                             >
-                                                Create a new task
+                                                Create a new audio task
                                             </Button>
-                                            <Button
-                                                type='primary'
-                                                icon={<span className='anticon'><MultiPlusIcon /></span>}
-                                                className='cvat-create-multi-tasks-button'
-                                                onClick={() => history.push(`/tasks/create?projectId=${id}&many=true`)}
-                                            >
-                                                Create multi tasks
-                                            </Button>
-                                        </>
-                                    ) : null}
-                                    {canCreateAudioTask ? (
-                                        <Button
-                                            type='primary'
-                                            icon={<SoundOutlined />}
-                                            className='cvat-create-audio-task-button'
-                                            onClick={() => history.push(`/tasks/create?projectId=${id}&type=audio`)}
-                                        >
-                                            Create a new audio task
-                                        </Button>
-                                    ) : null}
-                                </CvatDropdownMenuPaper>
-                            )}
-                        >
-                            <Button
-                                type='primary'
-                                className='cvat-create-task-dropdown'
-                                icon={<PlusOutlined />}
-                            />
-                        </Popover>
+                                        ) : null}
+                                    </CvatDropdownMenuPaper>
+                                )}
+                            >
+                                <Button
+                                    type='primary'
+                                    className='cvat-create-task-dropdown'
+                                    icon={<PlusOutlined />}
+                                />
+                            </Popover>
+                        </DPManagedGate>
                     </Col>
                 </Row>
                 { tasksFetching && !bulkFetching ? (

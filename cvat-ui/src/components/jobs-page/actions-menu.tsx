@@ -5,6 +5,7 @@
 import React, { useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { shallowEqual } from 'utils/redux';
+import { useDPManagedHide } from 'utils/dp-managed';
 import Dropdown from 'antd/lib/dropdown';
 import Modal from 'antd/lib/modal';
 
@@ -55,6 +56,8 @@ function JobActionsComponent(
         allJobs: state.jobs.current,
         currentOrganization: state.organizations.current,
     }), shallowEqual);
+    // data-pipeline：托管模式非 SA 用户隐藏 assignee/stage 菜单项
+    const dpHideManagedControls = useDPManagedHide();
     const isBulkMode = selectedIds.length > 1;
 
     let jobsToAct: Job[] = [jobInstance];
@@ -245,6 +248,7 @@ function JobActionsComponent(
             onGoToReplicas: jobInstance.replicasCount > 0 ? onGoToReplicas : null,
             jobsToAct,
             isExportAnnotationsDisabled,
+            dpHideManagedControls,
         }, props);
     }
 

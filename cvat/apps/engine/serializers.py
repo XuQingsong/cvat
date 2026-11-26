@@ -3871,6 +3871,9 @@ class AboutSerializer(serializers.Serializer):
     version = serializers.CharField(max_length=64)
     logo_url = serializers.CharField()
     subtitle = serializers.CharField(max_length=1024)
+    # data-pipeline：dp 托管标记（DP_PATCHES.md）；managed=true 时 UI 对
+    # 非 SA 用户隐藏 assignee/建删/stage 控件（服务端 rego 仍为权威）。
+    dp = serializers.DictField(required=False)
 
 
 class FrameMetaSerializer(serializers.Serializer):

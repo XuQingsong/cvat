@@ -15,6 +15,7 @@ import {
 import Button from 'antd/lib/button';
 import Input from 'antd/lib/input';
 import { importActions } from 'actions/import-actions';
+import DPManagedGate from 'utils/dp-managed';
 import {
     SortingComponent,
     ResourceFilterHOC,
@@ -107,52 +108,55 @@ export default function TopBarComponent(props: Readonly<VisibleTopBarProps>): JS
                         <TasksCSVExportButton query={query} />
                     </div>
                 </div>
-                <div>
-                    <Popover
-                        trigger={['click']}
-                        destroyTooltipOnHide
-                        overlayInnerStyle={{ padding: 0 }}
-                        content={(
-                            <CvatDropdownMenuPaper>
-                                <Button
-                                    className='cvat-create-task-button'
-                                    type='primary'
-                                    onClick={(): void => history.push('/tasks/create')}
-                                    icon={<PlusOutlined />}
-                                >
-                                    Create a new task
-                                </Button>
-                                <Button
-                                    className='cvat-create-audio-task-button'
-                                    type='primary'
-                                    onClick={(): void => history.push('/tasks/create?type=audio')}
-                                    icon={<SoundOutlined />}
-                                >
-                                    Create a new audio task
-                                </Button>
-                                <Button
-                                    className='cvat-create-multi-tasks-button'
-                                    type='primary'
-                                    onClick={(): void => history.push('/tasks/create?many=true')}
-                                    icon={<span className='anticon'><MultiPlusIcon /></span>}
-                                >
-                                    Create multi tasks
-                                </Button>
-                                <Button
-                                    className='cvat-import-task-button'
-                                    type='primary'
-                                    disabled={importing}
-                                    icon={importing ? <LoadingOutlined /> : <UploadOutlined />}
-                                    onClick={() => dispatch(importActions.openImportBackupModal('task'))}
-                                >
-                                    Create from backup
-                                </Button>
-                            </CvatDropdownMenuPaper>
-                        )}
-                    >
-                        <Button type='primary' className='cvat-create-task-dropdown' icon={<PlusOutlined />} />
-                    </Popover>
-                </div>
+                {/* data-pipeline：托管模式非 SA 用户不显示建任务入口 */}
+                <DPManagedGate>
+                    <div>
+                        <Popover
+                            trigger={['click']}
+                            destroyTooltipOnHide
+                            overlayInnerStyle={{ padding: 0 }}
+                            content={(
+                                <CvatDropdownMenuPaper>
+                                    <Button
+                                        className='cvat-create-task-button'
+                                        type='primary'
+                                        onClick={(): void => history.push('/tasks/create')}
+                                        icon={<PlusOutlined />}
+                                    >
+                                        Create a new task
+                                    </Button>
+                                    <Button
+                                        className='cvat-create-audio-task-button'
+                                        type='primary'
+                                        onClick={(): void => history.push('/tasks/create?type=audio')}
+                                        icon={<SoundOutlined />}
+                                    >
+                                        Create a new audio task
+                                    </Button>
+                                    <Button
+                                        className='cvat-create-multi-tasks-button'
+                                        type='primary'
+                                        onClick={(): void => history.push('/tasks/create?many=true')}
+                                        icon={<span className='anticon'><MultiPlusIcon /></span>}
+                                    >
+                                        Create multi tasks
+                                    </Button>
+                                    <Button
+                                        className='cvat-import-task-button'
+                                        type='primary'
+                                        disabled={importing}
+                                        icon={importing ? <LoadingOutlined /> : <UploadOutlined />}
+                                        onClick={() => dispatch(importActions.openImportBackupModal('task'))}
+                                    >
+                                        Create from backup
+                                    </Button>
+                                </CvatDropdownMenuPaper>
+                            )}
+                        >
+                            <Button type='primary' className='cvat-create-task-dropdown' icon={<PlusOutlined />} />
+                        </Popover>
+                    </div>
+                </DPManagedGate>
             </Col>
         </Row>
     );

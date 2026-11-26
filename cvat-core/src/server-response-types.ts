@@ -180,6 +180,11 @@ export interface SerializedAbout {
     version: string;
     logo_url: string;
     subtitle: string;
+    // data-pipeline：dp 托管标记（见 DP_PATCHES.md）
+    dp?: {
+        managed: boolean;
+        service_account: string;
+    };
 }
 
 export interface SerializedRemoteFile {

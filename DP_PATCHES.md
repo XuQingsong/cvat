@@ -9,6 +9,7 @@ data-pipeline annotation 服务（Portal 驱动，`dp-annotation` 服务账号�
 |---|---|
 | `cvat/apps/dpsso/` | SSO 桥 Django 应用：`/api/dp/sso?ticket=` 验 HMAC 一次性票据 → 建/更新用户（`dp-u-{uid}`，与 `dp-annotation` 服务账号命名空间隔离）+ 角色映射 → session login → 跳转 next。票据格式见 `dpsso/ticket.py`（dpsso1.b64json.b64hmac；exp≤60s；nonce 经 redis `cache.add` 单次消费）。角色：annotator→worker, qa→user, admin→admin（取最高）。密钥 env `CVAT_DP_SSO_SECRET`（空=禁用）。 |
 | `cvat/apps/iam/rules/dp.rego` | `package utils` 扩展：`DP_SERVICE_ACCOUNT="dp-annotation"`、`is_dp_service_account`、`is_dp_restricted_{job,task,project}_scope`。 |
+| `cvat-ui/src/utils/dp-managed.tsx` | UI 收敛 hook/门组件（B12b）：`useDPManagedHide()`=`about.dp.managed && user.username !== dp.serviceAccount`；`DPManagedGate` 包裹受限控件（非 SA 隐藏）。服务端 `dp` 缺省 → stock 行为。 |
 
 ## 修改的上游文件（最小 diff）
 
@@ -22,6 +23,9 @@ data-pipeline annotation 服务（Portal 驱动，`dp-annotation` 服务账号�
 | `cvat/apps/engine/rules/projects.rego` | 同法（CREATE/DELETE/UPDATE_ASSIGNEE）。 |
 | `cvat/apps/engine/rules/tests/generators/{jobs,tasks,projects}_test.gen.rego.py` | `eval_rule` 头部：受限 scope 对非 SA 恒 False（生成用例无 username，SA 永不命中 → 期望矩阵与新语义一致）。 |
 | `cvat/apps/engine/rules/tests/dp/dp_ssa_test.rego` | 新增 OPA 断言：SA 可 assignee/stage/建删；human admin/user/worker 不可；worker 仍可 update:state 完成自己 job（`opa test` 16/16）。 |
+| `cvat/apps/engine/views.py` + `serializers.py` | `/api/server/about` 下发 `dp={managed, service_account}`（`managed=bool(DP_SSO_SECRET)`）——UI 隐藏开关的服务端事实源（B12b）。 |
+| `cvat-core/src/{server-response-types.ts,about.ts}` | `SerializedAbout.dp?` + `AboutData.dp` getter（B12b）。 |
+| `cvat-ui/src/components/`（tasks-page、projects-page、project-page top-bar；job-item；task-page details；jobs-page actions-menu(+items)） | `DPManagedGate`/`useDPManagedHide` 包裹：建 task/project 入口（含空列表链接外的全部下拉）、job assignee+stage 选择器、task assignee 选择器、actions-menu edit_assignee/edit_stage 项（B12b）。 |
 
 ## 语义
 
@@ -31,6 +35,4 @@ data-pipeline annotation 服务（Portal 驱动，`dp-annotation` 服务账号�
 
 ## 未做
 
-- 前端隐藏 assignee/task-create UI（上游 UI 改动面大，rego 服务端已是权威；后续按最小 flag 加）。
-- 镜像构建 `dp-v2.83.0-<sha>`（本批离线：server/ui 构建依赖 apt/pip/npm 网络）。
 - opa test 用例（环境无 opa 二进制；规则经逐条 diff 复核）。

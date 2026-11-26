@@ -10,6 +10,7 @@ export default class AboutData {
     #version: string;
     #logoURL: string;
     #subtitle: string;
+    #dp: { managed: boolean; serviceAccount: string } | null;
 
     constructor(initialData: SerializedAbout) {
         this.#description = initialData.description;
@@ -17,6 +18,15 @@ export default class AboutData {
         this.#version = initialData.version;
         this.#logoURL = initialData.logo_url;
         this.#subtitle = initialData.subtitle;
+        this.#dp = initialData.dp ? {
+            managed: !!initialData.dp.managed,
+            serviceAccount: initialData.dp.service_account,
+        } : null;
+    }
+
+    // data-pipeline：dp 托管信息（null=stock CVAT）
+    get dp(): { managed: boolean; serviceAccount: string } | null {
+        return this.#dp;
     }
 
     get description(): string {

@@ -15,6 +15,7 @@ import {
     User, getCore, Project, Task, FramesMetaData, CloudStorage,
 } from 'cvat-core-wrapper';
 import AutomaticAnnotationProgress from 'components/tasks-page/automatic-annotation-progress';
+import DPManagedGate from 'utils/dp-managed';
 import MdGuideControl from 'components/md-guide/md-guide-control';
 import Preview from 'components/common/preview';
 import { cancelInferenceAsync } from 'actions/models-actions';
@@ -176,10 +177,13 @@ class DetailsComponent extends React.PureComponent<Props, State> {
                             </div>
                         )}
                     </Col>
-                    <Col>
-                        <Text type='secondary'>Assigned to</Text>
-                        {assigneeSelect}
-                    </Col>
+                    {/* data-pipeline：assignee 由服务账号管理，托管模式隐藏 */}
+                    <DPManagedGate>
+                        <Col>
+                            <Text type='secondary'>Assigned to</Text>
+                            {assigneeSelect}
+                        </Col>
+                    </DPManagedGate>
                 </Row>
                 <Row justify='end' className='cvat-task-details-cloud-storage'>
                     <CloudStorageEditor

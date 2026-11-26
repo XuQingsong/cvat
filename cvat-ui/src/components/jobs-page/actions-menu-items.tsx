@@ -28,6 +28,8 @@ interface MenuItemsData {
     startEditField: (key: string) => void;
     jobsToAct: Job[];
     isExportAnnotationsDisabled: boolean;
+    // data-pipeline：托管模式非 SA 用户隐藏 assignee/stage 编辑项
+    dpHideManagedControls?: boolean;
 }
 
 enum MenuKeys {
@@ -70,6 +72,7 @@ export default function JobActionsItems(
         onGoToParent,
         onGoToReplicas,
         isExportAnnotationsDisabled,
+        dpHideManagedControls,
     } = menuItemsData;
 
     const isBulkMode = jobsToAct.length > 1;
@@ -175,12 +178,14 @@ export default function JobActionsItems(
         }, 75]);
     }
 
-    menuItems.push([{
-        key: MenuKeys.EDIT_ASSIGNEE,
-        onClick: () => startEditField('assignee'),
-        label: <CVATMenuEditLabel>{withCount('Assignee', MenuKeys.EDIT_ASSIGNEE)}</CVATMenuEditLabel>,
-        disabled: isDisabled(MenuKeys.EDIT_ASSIGNEE),
-    }, 80]);
+    if (!dpHideManagedControls) {
+        menuItems.push([{
+            key: MenuKeys.EDIT_ASSIGNEE,
+            onClick: () => startEditField('assignee'),
+            label: <CVATMenuEditLabel>{withCount('Assignee', MenuKeys.EDIT_ASSIGNEE)}</CVATMenuEditLabel>,
+            disabled: isDisabled(MenuKeys.EDIT_ASSIGNEE),
+        }, 80]);
+    }
 
     if (onDistributeJobs) {
         menuItems.push([{
@@ -198,12 +203,14 @@ export default function JobActionsItems(
         disabled: isDisabled(MenuKeys.EDIT_STATE),
     }, 90]);
 
-    menuItems.push([{
-        key: MenuKeys.EDIT_STAGE,
-        onClick: () => startEditField('stage'),
-        label: <CVATMenuEditLabel>{withCount('Stage', MenuKeys.EDIT_STAGE)}</CVATMenuEditLabel>,
-        disabled: isDisabled(MenuKeys.EDIT_STAGE),
-    }, 100]);
+    if (!dpHideManagedControls) {
+        menuItems.push([{
+            key: MenuKeys.EDIT_STAGE,
+            onClick: () => startEditField('stage'),
+            label: <CVATMenuEditLabel>{withCount('Stage', MenuKeys.EDIT_STAGE)}</CVATMenuEditLabel>,
+            disabled: isDisabled(MenuKeys.EDIT_STAGE),
+        }, 100]);
+    }
 
     menuItems.push([{
         key: MenuKeys.VIEW_ANALYTICS,

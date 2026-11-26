@@ -25,6 +25,7 @@ import {
 import { formatTimeShort } from 'audio/utils/format-audio-time';
 import { useIsMounted, useContextMenuClick } from 'utils/hooks';
 import UserSelector from 'components/task-page/user-selector';
+import DPManagedGate from 'utils/dp-managed';
 import CVATTooltip from 'components/common/cvat-tooltip';
 import { CombinedState } from 'reducers';
 import CVATTag, { TagType } from 'components/common/cvat-tag';
@@ -196,32 +197,35 @@ function JobItem(props: Readonly<Props>): JSX.Element {
                     <Row className='cvat-job-item-selects' justify='space-between'>
                         <Col>
                             <Row>
-                                <Col className='cvat-job-item-select'>
-                                    <Row>
-                                        <Text>Assignee:</Text>
-                                    </Row>
-                                    <UserSelector
-                                        className='cvat-job-assignee-selector'
-                                        value={job.assignee}
-                                        onSelect={(user: User | null): void => {
-                                            if (job?.assignee?.id === user?.id) return;
-                                            onJobUpdate(job, { assignee: user });
-                                        }}
-                                    />
-                                </Col>
-                                <Col className='cvat-job-item-select'>
-                                    <Row justify='space-between' align='middle'>
-                                        <Col>
-                                            <Text>Stage:</Text>
-                                        </Col>
-                                    </Row>
-                                    <JobStageSelector
-                                        value={stage}
-                                        onSelect={(newValue: JobStage) => {
-                                            onJobUpdate(job, { stage: newValue });
-                                        }}
-                                    />
-                                </Col>
+                                {/* data-pipeline：assignee/stage 由服务账号管理，托管模式隐藏 */}
+                                <DPManagedGate>
+                                    <Col className='cvat-job-item-select'>
+                                        <Row>
+                                            <Text>Assignee:</Text>
+                                        </Row>
+                                        <UserSelector
+                                            className='cvat-job-assignee-selector'
+                                            value={job.assignee}
+                                            onSelect={(user: User | null): void => {
+                                                if (job?.assignee?.id === user?.id) return;
+                                                onJobUpdate(job, { assignee: user });
+                                            }}
+                                        />
+                                    </Col>
+                                    <Col className='cvat-job-item-select'>
+                                        <Row justify='space-between' align='middle'>
+                                            <Col>
+                                                <Text>Stage:</Text>
+                                            </Col>
+                                        </Row>
+                                        <JobStageSelector
+                                            value={stage}
+                                            onSelect={(newValue: JobStage) => {
+                                                onJobUpdate(job, { stage: newValue });
+                                            }}
+                                        />
+                                    </Col>
+                                </DPManagedGate>
                                 <Col className='cvat-job-item-select'>
                                     <Row justify='space-between' align='middle'>
                                         <Col>

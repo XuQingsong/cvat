@@ -11,6 +11,7 @@ import Button from 'antd/lib/button';
 import Popover from 'antd/lib/popover';
 import Input from 'antd/lib/input';
 import { LoadingOutlined, PlusOutlined, UploadOutlined } from '@ant-design/icons';
+import DPManagedGate from 'utils/dp-managed';
 import { importActions } from 'actions/import-actions';
 import { usePrevious } from 'utils/hooks';
 import { ProjectsQuery } from 'reducers';
@@ -102,37 +103,40 @@ function TopBarComponent(props: Readonly<Props>): JSX.Element {
                         <ProjectsCSVExportButton query={query} />
                     </div>
                 </div>
-                <div>
-                    <Popover
-                        destroyTooltipOnHide
-                        trigger={['click']}
-                        overlayInnerStyle={{ padding: 0 }}
-                        content={(
-                            <div className='cvat-projects-page-control-buttons-wrapper'>
-                                <Button
-                                    id='cvat-create-project-button'
-                                    className='cvat-create-project-button'
-                                    type='primary'
-                                    onClick={(): void => history.push('/projects/create')}
-                                    icon={<PlusOutlined />}
-                                >
-                                    Create a new project
-                                </Button>
-                                <Button
-                                    className='cvat-import-project-button'
-                                    type='primary'
-                                    disabled={importing}
-                                    icon={importing ? <LoadingOutlined /> : <UploadOutlined />}
-                                    onClick={() => dispatch(importActions.openImportBackupModal('project'))}
-                                >
-                                    Create from backup
-                                </Button>
-                            </div>
-                        )}
-                    >
-                        <Button type='primary' className='cvat-create-project-dropdown' icon={<PlusOutlined />} />
-                    </Popover>
-                </div>
+                {/* data-pipeline：托管模式非 SA 用户不显示建项目入口 */}
+                <DPManagedGate>
+                    <div>
+                        <Popover
+                            destroyTooltipOnHide
+                            trigger={['click']}
+                            overlayInnerStyle={{ padding: 0 }}
+                            content={(
+                                <div className='cvat-projects-page-control-buttons-wrapper'>
+                                    <Button
+                                        id='cvat-create-project-button'
+                                        className='cvat-create-project-button'
+                                        type='primary'
+                                        onClick={(): void => history.push('/projects/create')}
+                                        icon={<PlusOutlined />}
+                                    >
+                                        Create a new project
+                                    </Button>
+                                    <Button
+                                        className='cvat-import-project-button'
+                                        type='primary'
+                                        disabled={importing}
+                                        icon={importing ? <LoadingOutlined /> : <UploadOutlined />}
+                                        onClick={() => dispatch(importActions.openImportBackupModal('project'))}
+                                    >
+                                        Create from backup
+                                    </Button>
+                                </div>
+                            )}
+                        >
+                            <Button type='primary' className='cvat-create-project-dropdown' icon={<PlusOutlined />} />
+                        </Popover>
+                    </div>
+                </DPManagedGate>
             </Col>
         </Row>
     );

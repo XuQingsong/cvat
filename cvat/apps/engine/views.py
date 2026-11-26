@@ -233,6 +233,12 @@ class ServerViewSet(viewsets.ViewSet):
             "logo_url": request.build_absolute_uri(
                 storages["staticfiles"].url(settings.LOGO_FILENAME)
             ),
+            # data-pipeline：DP_SSO_SECRET 启用 → dp 托管模式，UI 隐藏受限控件
+            # （OPA rego 仍是权威判定；secret 空=stock 行为）。
+            "dp": {
+                "managed": bool(getattr(settings, "DP_SSO_SECRET", "")),
+                "service_account": "dp-annotation",
+            },
         }
         serializer = AboutSerializer(data=about)
         if serializer.is_valid(raise_exception=True):
